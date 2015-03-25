@@ -1576,29 +1576,34 @@ require_once("DbConnection.php");
 
             } else {    //尚未投稿過
               $articleInfo = $this->LoadUnitInfo($id, 0);
-              $addArticle = $this->addArticleToMSList($id,$class_code,$articleInfo->time);
-              if($addArticle){
-                  $publish_id = $this->getIDFromMSList($id);
-                  $this->addArticleToMSExample($publish_id,$id);
-                  $this->addArticleToMSGuidance($id);
-                  $DbConnection = new DbConnection();
-                  $dbh = $DbConnection->Open();
-
-                  $sql = "UPDATE `Competition_CMSUnit` SET `isSend` = '1' WHERE `id` = :id";
-                  $sth = $dbh->prepare($sql);
-                  $sth->bindParam(':id', $id);
-                  $result = $sth->execute();
-
-                  if ($result) {
-                    return "投稿教材成功!";
-                  }else {
-                    return "投稿教材時發生錯誤!";
-                  }
-
-                  $DbConnection->Close();
+              if($articleInfo->keyWord1 == '' && $articleInfo->keyWord2 == '' && $articleInfo->keyWord3 == ''){
+                return "主題至少要設有三個關鍵字!";
               } else {
-                return "投稿教材時發生錯誤!";
+                $addArticle = $this->addArticleToMSList($id,$class_code,$articleInfo->time);
+                if($addArticle){
+                    $publish_id = $this->getIDFromMSList($id);
+                    $this->addArticleToMSExample($publish_id,$id);
+                    $this->addArticleToMSGuidance($id);
+                    $DbConnection = new DbConnection();
+                    $dbh = $DbConnection->Open();
+
+                    $sql = "UPDATE `Competition_CMSUnit` SET `isSend` = '1' WHERE `id` = :id";
+                    $sth = $dbh->prepare($sql);
+                    $sth->bindParam(':id', $id);
+                    $result = $sth->execute();
+
+                    if ($result) {
+                      return "投稿教材成功!";
+                    }else {
+                      return "投稿教材時發生錯誤!";
+                    }
+
+                    $DbConnection->Close();
+                } else {
+                  return "投稿教材時發生錯誤!";
+                }
               }
+                
             }
             
         }
